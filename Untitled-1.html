@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Transformer IoT System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+        }
+        header {
+            background-color: #00695c;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo img {
+            height: 50px;
+        }
+        h1 {
+            margin: 0;
+        }
+        .user-menu img {
+            height: 30px;
+            margin-left: 20px;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 20px;
+        }
+        .sidebar, .right-sidebar {
+            flex: 1;
+            max-width: 250px;
+            margin: 10px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        main {
+            flex: 3;
+            margin: 10px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .transformer-info h2, .transformer-info h3 {
+            margin: 10px 0;
+        }
+        .transformer-info p {
+            margin: 5px 0;
+        }
+        .info-box {
+            display: flex;
+            align-items: center;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .info-box img {
+            height: 30px;
+            margin-right: 10px;
+        }
+        .info-box .info-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .info-box.transformer-id {
+            background-color: #e0f7fa;
+        }
+        .info-box.last-pm {
+            background-color: #ffe0b2;
+        }
+        .info-box.next-pm {
+            background-color: #dcedc8;
+        }
+        .health-index {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .parameter-cards {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .parameter-cards > div {
+            flex: 1;
+            margin: 0 10px;
+            background-color: #f7f7f7;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .current-history, .load-percentage {
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .current-history-header, .load-percentage-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .current-history-header img, .load-percentage-header img {
+            height: 30px;
+            margin-right: 10px;
+        }
+        .current-history-header h2, .load-percentage-header h2 {
+            margin: 0;
+        }
+        .voltage-current-info {
+            display: flex;
+            justify-content: space-between;
+        }
+        .voltage, .current {
+            flex: 1;
+            margin: 0 10px;
+            background-color: #f7f7f7;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .transformer-status {
+            margin-top: 20px;
+            background-color: #f7f7f7;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+    <!-- รวม Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="ekarat_logo.png" alt="Ekarat Logo">
+        </div>
+        <h1>Smart Transformer IoT System</h1>
+        <div class="user-menu">
+            <img src="notification_icon.png" alt="Notifications">
+            <img src="profile_icon.png" alt="User Profile">
+        </div>
+    </header>
+    <div class="container">
+        <aside class="sidebar">
+            <div class="transformer-info">
+                <div class="info-box transformer-id">
+                    <img src="transformer_icon.png" alt="Transformer ID Icon">
+                    <div class="info-text">
+                        <h2>Transformer ID</h2>
+                        <p>60143368EE</p>
+                    </div>
+                </div>
+                <div class="info-box last-pm">
+                    <img src="last_pm_icon.png" alt="Last PM Icon">
+                    <div class="info-text">
+                        <h3>Last PM</h3>
+                        <p>12 พ.ย. 66</p>
+                    </div>
+                </div>
+                <div class="info-box next-pm">
+                    <img src="next_pm_icon.png" alt="Next PM Icon">
+                    <div class="info-text">
+                        <h3>Next PM</h3>
+                        <p>12 พ.ย. 67</p>
+                    </div>
+                </div>
+                <div class="health-index">
+                    <h2>Health Index</h2>
+                    <canvas id="healthIndexChart"></canvas>
+                    <p id="healthIndexText">100%</p>
+                </div>
+            </div>
+        </aside>
+        <main>
+            <div class="current-history">
+                <div class="current-history-header">
+                    <img src="current_history_icon.png" alt="Current History Icon">
+                    <div>
+                        <h2>Current History</h2>
+                        <p>การใช้งาน 24 ชั่วโมงย้อนหลัง</p>
+                    </div>
+                </div>
+                <canvas id="currentHistoryChart"></canvas>
+            </div>
+            <div class="parameter-cards">
+                <div class="power-factor">
+                    <h2>Power Factor: 0.78</h2>
+                    <p>Power Factor R: 0.82</p>
+                    <p>Power Factor S: 0.77</p>
+                    <p>Power Factor T: 0.61</p>
+                </div>
+                <div class="voltage-rst">
+                    <h2>Voltage R-S-T</h2>
+                    <p>Voltage R: 401.6 V</p>
+                    <p>Voltage S: 401.4 V</p>
+                    <p>Voltage T: 403.0 V</p>
+                </div>
+                <div class="other-parameters">
+                    <h2>Other Parameters</h2>
+                    <p>Frequency: 49.96 Hz</p>
+                    <p>Active Power: 60.06 kW</p>
+                    <p>Active Energy: 273,557 kWh</p>
+                    <p>Reactive Energy: 305,227 kVArh</p>
+                    <p>Apparent Power: 60.78 kVA</p>
+                    <p>THD Current R: 9.47 %</p>
+                    <p>THD Current S: 9.76 %</p>
+                    <p>THD Current T: 11.31 %</p>
+                    <p>THD Voltage R-S: 1.91 %</p>
+                    <p>THD Voltage S-T: 1.90 %</p>
+                    <p>THD Voltage T-R: 2.02 %</p>
+                </div>
+            </div>
+            <div class="load-percentage">
+                <div class="load-percentage-header">
+                    <img src="load_percentage_icon.png" alt="Load Percentage Icon">
+                    <div>
+                        <h2>Load %</h2>
+                        <p>24 ชั่วโมงย้อนหลัง</p>
+                    </div>
+                </div>
+                <canvas id="loadPercentageChart"></canvas>
+            </div>
+        </main>
+        <aside class="right-sidebar">
+            <div class="voltage-current-info">
+                <div class="voltage">
+                    <h2>Voltage R: 232.56 V</h2>
+                    <h2>Voltage S: 231.30 V</h2>
+                    <h2>Voltage T: 232.59 V</h2>
+                </div>
+                <div class="current">
+                    <h2>Current R: 85.24 A</h2>
+                    <h2>Current S: 110.13 A</h2>
+                    <h2>Current T: 90.81 A</h2>
+                </div>
+            </div>
+            <div class="transformer-status">
+                <h2>Transformer Status</h2>
+                <p>Top1: ON</p>
+                <p>Top2: ON</p>
+                <p>Oil Level: Normal</p>
+                <p>Pressure: Normal</p>
+                <p>EnvTemp: 33.2°C</p>
+            </div>
+        </aside>
+    </div>
+    <script>
+        // JavaScript code for chart rendering
+
+        // Health Index Chart
+        const ctxHealthIndex = document.getElementById('healthIndexChart').getContext('2d');
+        const healthIndexChart = new Chart(ctxHealthIndex, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [100, 0],
+                    backgroundColor: ['#4caf50', '#e0e0e0'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                cutout: '80%',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                }
+            }
+        });
+
+        // Current History Chart
+        const ctxCurrentHistory = document.getElementById('currentHistoryChart').getContext('2d');
+        const currentHistoryChart = new Chart(ctxCurrentHistory, {
+            type: 'line',
+            data: {
+                labels: ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00'],
+                datasets: [
+                    {
+                        label: 'Line 1',
+                        data: [10, 20, 30, 40, 50, 60, 70],
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 1,
+                        fill: true
+                    },
+                    {
+                        label: 'Line 2',
+                        data: [20, 30, 40, 50, 60, 70, 80],
+                        borderColor: 'rgba(255, 159, 64, 1)',
+                        backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                        borderWidth: 1,
+                        fill: true
+                    },
+                    {
+                        label: 'Line 3',
+                        data: [30, 40, 50, 60, 70, 80, 90],
+                        borderColor: 'rgba(153, 102, 255, 1)',
+                        backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                        borderWidth: 1,
+                        fill: true
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 30
+                        }
+                    }
+                }
+            }
+        });
+
+        // Load Percentage Chart
+        const ctxLoadPercentage = document.getElementById('loadPercentageChart').getContext('2d');
+        const loadPercentageChart = new Chart(ctxLoadPercentage, {
+            type: 'bar',
+            data: {
+                labels: Array.from({length: 24}, (_, i) => `${i}:00`),
+                datasets: [{
+                    label: 'Load %',
+                    data: [10, 20, 30, 40, 50, 60, 70, 60, 50, 40, 30, 20, 10, 15, 25, 35, 45, 55, 65, 75, 85, 95, 85, 75],
+                    backgroundColor: function(context) {
+                        const index = context.dataIndex;
+                        const value = context.dataset.data[index];
+                        return value > 60 ? 'rgba(255, 99, 132, 0.5)' : value > 30 ? 'rgba(255, 159, 64, 0.5)' : 'rgba(54, 162, 235, 0.5)';
+                    },
+                    borderColor: function(context) {
+                        const index = context.dataIndex;
+                        const value = context.dataset.data[index];
+                        return value > 60 ? 'rgba(255, 99, 132, 1)' : value > 30 ? 'rgba(255, 159, 64, 1)' : 'rgba(54, 162, 235, 1)';
+                    },
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        beginAtZero: true
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
